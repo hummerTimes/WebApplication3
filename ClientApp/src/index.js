@@ -5,50 +5,52 @@ import { makeData, Logo, Tips } from "./Utils";
 // Import React Table
 import ReactTable from "react-table";
 import "react-table/react-table.css";
-import matchSorter from 'match-sorter';
-import {newPerson , range} from './Utils';
+import matchSorter from "match-sorter";
+import { newPerson, range } from "./Utils";
 
 class App extends React.Component {
   constructor() {
     super();
-    this.state = { data: [] };
-
     this.state = {
       data: makeData().map(item => ({ ...item }))
-      };
-      this.loadData();      
-    }
-    loadData = () => {
-        fetch('api/SampleData/Phones')
-        .then(response => response.json())
-                  .then(data => {
-              this.setState({ data });
-                  }); 
-    }
-    deleteData = (item) => {
-        return fetch('api/SampleData/Phones' + '/' + item, {
-            method: 'delete'
-        }).then(response =>
-            response.json().then(json => {
-                return json;
-            })
-        );
-    }
-   
-    onAddPhone = (phone) => {
-        fetch('api/SampleData/Phones', {
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ name: 'Alibaba', phone: '111' })
-    })
-        .then(function (res) { return res.json(); })
-        .then(function (data) { alert(JSON.stringify(data)) })
     };
+    this.loadData();
+  }
+  loadData = () => {
+    fetch("api/SampleData/Phones")
+      .then(response => response.json())
+      .then(data => {
+        this.setState({ data });
+      });
+  };
+  deleteData = item => {
+    return fetch("api/SampleData/Phones" + "/" + item, {
+      method: "delete"
+    }).then(response =>
+      response.json().then(json => {
+        return json;
+      })
+    );
+  };
 
-  renderEditable = (cellInfo) => {
+  onAddPhone = phone => {
+    fetch("api/SampleData/Phones", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ name: "Alibaba", phone: "111" })
+    })
+      .then(function(res) {
+        return res.json();
+      })
+      .then(function(data) {
+        alert(JSON.stringify(data));
+      });
+  };
+
+  renderEditable = cellInfo => {
     return (
       <div
         style={{ backgroundColor: "#fafafa" }}
@@ -65,28 +67,26 @@ class App extends React.Component {
         }}
       />
     );
-  }
-  handleDelete = (rows) => 
-  {
-      var { data } = this.state;
-      const { id, name } = rows;
-      data.splice(id, 1);
-      this.deleteData(name);
-      this.setState(function(prevState, props){
-      return {data}
+  };
+  handleDelete = rows => {
+    var { data } = this.state;
+    const { id, name } = rows;
+    data.splice(id, 1);
+    this.deleteData(name);
+    this.setState(function(prevState, props) {
+      return { data };
     });
-        
-  }
+  };
   addRow = () => {
-    var {data} = this.state;
+    var { data } = this.state;
     data.unshift({
       ...newPerson(),
       children: range(10).map(newPerson),
-      name : "worker"
+      name: "worker"
     });
     this.onAddPhone();
-    this.setState({data})
-  }
+    this.setState({ data });
+  };
 
   render() {
     const { data } = this.state;
@@ -96,8 +96,8 @@ class App extends React.Component {
           data={data}
           filterable
           defaultFilterMethod={(filter, row) =>
-            String(row[filter.id]) === filter.value}
-
+            String(row[filter.id]) === filter.value
+          }
           defaultSorted={[
             {
               id: "full",
@@ -109,7 +109,7 @@ class App extends React.Component {
               Header: "First Name",
               accessor: "name",
               filterMethod: (filter, rows) =>
-              matchSorter(rows, filter.value, { keys: ["dateFormatted"] }),
+                matchSorter(rows, filter.value, { keys: ["dateFormatted"] }),
               filterAll: true,
               Cell: this.renderEditable
             },
@@ -124,18 +124,22 @@ class App extends React.Component {
               Cell: this.renderEditable
             },
             {
-              Header: 'Remove',
-              Cell: (rows) => (
-                  <div>
-                      <button onClick={() => this.handleDelete(rows.original)}>Delete</button>
-                  </div>
-              )    
-           }
+              Header: "Remove",
+              Cell: rows => (
+                <div>
+                  <button onClick={() => this.handleDelete(rows.original)}>
+                    Delete
+                  </button>
+                </div>
+              )
+            }
           ]}
           defaultPageSize={10}
           className="-striped -highlight"
         />
-         <button id="addBtn" onClick={() => this.addRow()}>ADD</button>
+        <button id="addBtn" onClick={() => this.addRow()}>
+          ADD
+        </button>
       </div>
     );
   }
